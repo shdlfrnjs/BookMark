@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+// src/components/SearchBar.js
+import React from "react";
+import { TextInput, Button, View, StyleSheet } from "react-native";
 
 const SearchBar = ({ query, setQuery, onSearch }) => (
-  <View style={styles.container}>
+  <View style={styles.searchContainer}>
     <TextInput
       style={styles.input}
       placeholder="책 제목을 입력하세요"
@@ -14,18 +15,8 @@ const SearchBar = ({ query, setQuery, onSearch }) => (
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    margin: 10,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginRight: 5,
-  },
+  searchContainer: { marginBottom: 20 },
+  input: { borderWidth: 1, padding: 10, borderColor: "#ccc", marginBottom: 10 },
 });
 
 export default SearchBar;
