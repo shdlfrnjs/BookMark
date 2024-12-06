@@ -37,3 +37,6 @@ yarn-error.*
 
 # aladinApi
 /src/api/aladinApi.js
+
+#firebase
+firebase.json
