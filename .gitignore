@@ -35,8 +35,8 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# aladinApi
-/src/api/aladinApi.js
+# Environment Variables
+.env
 
 #firebase
 firebase.json
