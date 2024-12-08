@@ -1,12 +1,14 @@
-// firebaseConfig.js
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth'; // getAuth 삭제
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'; 
+import firebaseConfig from '../firebase.json'; // firebase.json을 import
 
-// Node.js 환경에서는 require 사용
-const firebaseConfig = require('./firebase.json');
-
-// Firebase 초기화
+// Firebase 앱 초기화
 const app = initializeApp(firebaseConfig);
 
-// Firebase Authentication 설정
-export const auth = getAuth(app);
+// AsyncStorage를 사용하여 인증 상태를 지속하도록 설정
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage), // persistence 설정
+});
+
+export { auth }; 
