@@ -41,11 +41,15 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="로그인" onPress={handleLogin} />
-      <Button
-        title="회원가입"
-        onPress={() => navigation.navigate("Signup")} // 회원가입 페이지로 이동
-      />
+      <View style={styles.buttonContainer}>
+        <Button title="로그인" onPress={handleLogin} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button
+          title="회원가입"
+          onPress={() => navigation.navigate("Signup")} // 회원가입 페이지로 이동
+        />
+      </View>
     </View>
   );
 };
@@ -54,6 +58,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 20 },
   title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
   input: { borderWidth: 1, padding: 10, marginBottom: 10, borderColor: "#ccc" },
+  buttonContainer: {
+    marginBottom: 10, // 버튼 사이에 마진 추가
+  },
 });
 
 export default LoginScreen;

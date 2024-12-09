@@ -1,9 +1,10 @@
 // src/components/BookList.js
-import React from "react";
+import React, { forwardRef } from "react";
 import { FlatList, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
-const BookList = ({ books, onSelectBook }) => (
+const BookList = forwardRef(({ books, onSelectBook }, ref) => (
   <FlatList
+    ref={ref} // ref 전달
     data={books}
     keyExtractor={(item) => item.itemId.toString()}
     renderItem={({ item }) => (
@@ -19,7 +20,7 @@ const BookList = ({ books, onSelectBook }) => (
       </TouchableOpacity>
     )}
   />
-);
+));
 
 const styles = StyleSheet.create({
   item: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#eee" },
