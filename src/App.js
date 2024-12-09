@@ -3,12 +3,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage 임포트
+
 import HomeScreen from "./screens/HomeScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
 import SettingsScreen from "./screens/SettingsScreen"; // 설정 화면 추가
 import MyBooksScreen from "./screens/MyBooksScreen";
+import ReadingScheduleScreen from "./screens/ReadingScheduleScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator(); // Tab.Navigator 사용
@@ -35,9 +37,10 @@ const App = () => {
 
   const TabNavigator = () => (
     <Tab.Navigator>
-      <Tab.Screen name="검색" component={HomeScreen} />
+      <Tab.Screen name="도서 검색" component={HomeScreen} />
+      <Tab.Screen name="독서 일정" component={ReadingScheduleScreen} />
       <Tab.Screen name="나의 도서" component={MyBooksScreen} />
-      <Tab.Screen name="설정" component={SettingsScreen} />
+      <Tab.Screen name="마이페이지" component={SettingsScreen} />
     </Tab.Navigator>
   );
 
