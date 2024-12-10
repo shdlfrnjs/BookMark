@@ -42,7 +42,9 @@ const ReadingScheduleScreen = () => {
     const user = auth.currentUser;
     if (user) {
       const booksSnapshot = await getDocs(collection(db, "books"));
-      const booksList = booksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const booksList = booksSnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((book) => !book.isCompleted); // isCompleted가 true인 책은 제외
       setMyBooks(booksList);
     }
   };
@@ -74,6 +76,9 @@ const ReadingScheduleScreen = () => {
     const userId = user.uid;
 
     const bookDetailsPromises = logs.map(async (log) => {
+      let bookData = null;
+
+      // Query by ISBN if available
       if (log.isbn13) {
         const bookQuery = query(
           collection(db, "books"),
@@ -83,19 +88,29 @@ const ReadingScheduleScreen = () => {
         const bookSnapshot = await getDocs(bookQuery);
 
         if (!bookSnapshot.empty) {
-          const bookData = bookSnapshot.docs[0].data();
-          return {
-            cover: bookData.cover || null,
-            title: bookData.title || "제목 없음",
-            author: bookData.author || "저자 정보 없음",
-            review: log.review || "감상문 없음",
-          };
+          bookData = bookSnapshot.docs[0].data();
         }
       }
+
+      // If no ISBN or data not found, query by title and userId
+      if (!bookData && log.title) {
+        const titleQuery = query(
+          collection(db, "books"),
+          where("title", "==", log.title),
+          where("userId", "==", userId)
+        );
+        const titleSnapshot = await getDocs(titleQuery);
+
+        if (!titleSnapshot.empty) {
+          bookData = titleSnapshot.docs[0].data();
+        }
+      }
+
+      // Return fetched or default values
       return {
-        cover: null,
-        title: log.title || "제목 없음",
-        author: "정보 없음",
+        cover: bookData?.cover || null,
+        title: bookData?.title || log.title || "제목 없음",
+        author: bookData?.author || "정보 없음",
         review: log.review || "감상문 없음",
       };
     });
@@ -121,12 +136,26 @@ const ReadingScheduleScreen = () => {
       if (bookSnap.exists()) {
         const bookData = bookSnap.data();
         const currentPages = bookData.readPages || 0;
+        const pageCount = bookData.pageCount || 0;
 
+        // 새로 추가될 읽은 페이지 수
+        let newReadPages = currentPages + parseInt(pagesRead, 10);
+        let isCompleted = false;
+
+        // readPages가 pageCount를 초과하지 않도록 처리
+        if (newReadPages >= pageCount) {
+          newReadPages = pageCount;
+          isCompleted = true;
+        }
+
+        // Update book data
         await updateDoc(bookRef, {
-          readPages: currentPages + parseInt(pagesRead, 10),
+          readPages: newReadPages,
+          ...(isCompleted && { isCompleted: true }), // 다 읽은 책 표시
         });
 
         try {
+          // Save reading log
           await addDoc(collection(db, "readingLogs"), {
             userId: user.uid,
             isbn13: bookData.isbn13,
@@ -135,7 +164,19 @@ const ReadingScheduleScreen = () => {
             review: review.trim(),
           });
 
-          Alert.alert("성공", `읽은 페이지와 감상문이 저장되었습니다.`);
+          Alert.alert(
+            "성공",
+            `읽은 페이지와 감상문이 저장되었습니다.${
+              isCompleted ? "\n축하합니다! 책을 다 읽었습니다! 나의 도서 탭에서 독후감을 작성해 보세요." : ""
+            }`
+          );
+
+          // 다 읽었으면 myBooks 갱신
+          if (isCompleted) {
+            await fetchMyBooks();
+          }
+          
+          setIsFormVisible(false);
           setPagesRead("");
           setReview("");
           setSelectedBook(null);
