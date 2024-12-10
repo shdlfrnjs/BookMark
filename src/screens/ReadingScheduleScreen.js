@@ -9,10 +9,20 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from "react-native";
 import { getAuth } from "firebase/auth";
 import { db } from "../firebaseConfig";
-import { doc, getDoc, updateDoc, collection, getDocs, addDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  getDocs,
+  addDoc,
+  query,
+  where,
+} from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
 import { Calendar } from "react-native-calendars";
 
@@ -22,9 +32,11 @@ const ReadingScheduleScreen = () => {
   const [pagesRead, setPagesRead] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [review, setReview] = useState("");
-  const [isFormVisible, setIsFormVisible] = useState(false); // 폼 표시 상태
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [readingLogs, setReadingLogs] = useState([]);
+  const [bookDetails, setBookDetails] = useState([]);
 
-  // 나의 도서 목록 가져오기
+  // Fetch user's book list
   const fetchMyBooks = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -35,7 +47,64 @@ const ReadingScheduleScreen = () => {
     }
   };
 
-  // 페이지 수 및 감상문 저장
+  // Fetch reading logs for selected date
+  const fetchReadingLogs = async (date) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const logsQuery = query(
+        collection(db, "readingLogs"),
+        where("userId", "==", user.uid),
+        where("date", "==", date)
+      );
+      const logsSnapshot = await getDocs(logsQuery);
+      const logs = logsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setReadingLogs(logs);
+      await fetchBookDetails(logs);
+    }
+  };
+
+  // Fetch book details for logs
+  const fetchBookDetails = async (logs) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    const userId = user.uid;
+
+    const bookDetailsPromises = logs.map(async (log) => {
+      if (log.isbn13) {
+        const bookQuery = query(
+          collection(db, "books"),
+          where("isbn13", "==", log.isbn13),
+          where("userId", "==", userId)
+        );
+        const bookSnapshot = await getDocs(bookQuery);
+
+        if (!bookSnapshot.empty) {
+          const bookData = bookSnapshot.docs[0].data();
+          return {
+            cover: bookData.cover || null,
+            title: bookData.title || "제목 없음",
+            author: bookData.author || "저자 정보 없음",
+            review: log.review || "감상문 없음",
+          };
+        }
+      }
+      return {
+        cover: null,
+        title: log.title || "제목 없음",
+        author: "정보 없음",
+        review: log.review || "감상문 없음",
+      };
+    });
+
+    const details = await Promise.all(bookDetailsPromises);
+    setBookDetails(details);
+  };
+
+  // Save reading progress
   const addReadingProgress = async () => {
     if (!selectedBook || !pagesRead || pagesRead <= 0 || !selectedDate) {
       Alert.alert("에러", "책, 날짜를 선택하고 읽은 페이지 수를 입력하세요.");
@@ -53,12 +122,10 @@ const ReadingScheduleScreen = () => {
         const bookData = bookSnap.data();
         const currentPages = bookData.readPages || 0;
 
-        // 읽은 페이지 수 업데이트
         await updateDoc(bookRef, {
-          readPages: currentPages + pagesRead,
+          readPages: currentPages + parseInt(pagesRead, 10),
         });
 
-        // 독서 감상문 저장
         try {
           await addDoc(collection(db, "readingLogs"), {
             userId: user.uid,
@@ -69,24 +136,28 @@ const ReadingScheduleScreen = () => {
           });
 
           Alert.alert("성공", `읽은 페이지와 감상문이 저장되었습니다.`);
+          setPagesRead("");
+          setReview("");
+          setSelectedBook(null);
+          fetchReadingLogs(selectedDate); // Refresh logs
         } catch (error) {
           Alert.alert("에러", "감상문 저장 중 문제가 발생했습니다.");
         }
-
-        // 입력값 초기화
-        setPagesRead("");
-        setReview("");
-        setSelectedBook(null);
       } else {
         Alert.alert("에러", "해당 도서를 찾을 수 없습니다.");
       }
     }
   };
 
-  // 화면에 도서 목록 불러오기
   useEffect(() => {
     fetchMyBooks();
   }, []);
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchReadingLogs(selectedDate);
+    }
+  }, [selectedDate]);
 
   return (
     <KeyboardAvoidingView
@@ -95,76 +166,84 @@ const ReadingScheduleScreen = () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.text}>날짜 선택:</Text>
-        {/* 캘린더 */}
         <Calendar
           onDayPress={(day) => {
             setSelectedDate(day.dateString);
-            setIsFormVisible(false); // 날짜 선택 시 폼 가리기
-            setPagesRead(""); // 읽은 페이지 수 초기화
-            setReview(""); // 감상문 초기화
-            setSelectedBook(null); // 선택된 책 초기화
+            setIsFormVisible(false);
+            setPagesRead("");
+            setReview("");
+            setSelectedBook(null);
           }}
           markedDates={selectedDate ? { [selectedDate]: { selected: true, marked: true } } : {}}
         />
 
-        {/* 독서 기록 작성 버튼 */}
-        {!isFormVisible && (
-          <Button
-            title="독서 기록 작성"
-            onPress={() => setIsFormVisible(true)}
-          />
+        {readingLogs.length > 0 && (
+          <View style={{ marginTop: 20 }}>
+            <Text style={styles.text}>독서 기록:</Text>
+            {bookDetails.map((detail, index) => (
+              <View key={index} style={styles.logContainer}>
+                <View style={styles.logHeader}>
+                  {detail.cover ? (
+                    <Image source={{ uri: detail.cover }} style={styles.coverImage} />
+                  ) : (
+                    <View style={styles.placeholderImage}>
+                      <Text>이미지 없음</Text>
+                    </View>
+                  )}
+                  <View style={styles.logDetails}>
+                    <Text style={styles.bookTitle} numberOfLines={1} ellipsizeMode="tail">
+                      {detail.title}
+                    </Text>
+                    <Text style={styles.bookAuthor}>{detail.author}</Text>
+                  </View>
+                </View>
+                <Text style={styles.reviewText}>독서 감상문: {detail.review}</Text>
+              </View>
+            ))}
+          </View>
         )}
 
-        {/* 폼: 독서 기록 작성 */}
+        {!isFormVisible && (
+          <Button title="독서 기록 작성" onPress={() => setIsFormVisible(true)} />
+        )}
+
         {isFormVisible && (
           <View style={styles.formContainer}>
-            {/* 책 선택하기 */}
-            <Text style={styles.text}>도서 선택:</Text>
-            <Picker
-              selectedValue={selectedBook}
-              onValueChange={(itemValue) => setSelectedBook(itemValue)}
-              style={styles.picker}
-            >
+            <Picker selectedValue={selectedBook} onValueChange={(itemValue) => setSelectedBook(itemValue)}>
               <Picker.Item label="책을 선택하세요" value={null} />
               {myBooks.map((book) => (
                 <Picker.Item key={book.id} label={book.title} value={book.id} />
               ))}
             </Picker>
-
-            {/* 읽은 페이지 수 입력 */}
-            <Text style={styles.text}>읽은 페이지 수:</Text>
             <TextInput
               style={styles.input}
+              placeholder="읽은 페이지 수"
               keyboardType="numeric"
-              value={pagesRead !== "" ? pagesRead.toString() : ""} // null일 경우 비우기
-              onChangeText={(text) => setPagesRead(text ? Number(text) : "")} // 빈 입력은 null로 설정
-              placeholder="0" // 0을 기본 가이드로 표시
+              value={pagesRead}
+              onChangeText={setPagesRead}
             />
-
-            {/* 독서 감상문 입력 */}
-            <Text style={styles.text}>독서 감상문:</Text>
             <TextInput
-              style={[styles.input, { height: 100, textAlignVertical: "top" }]}
+              style={styles.input}
+              placeholder="독서 감상문"
               multiline
               value={review}
               onChangeText={setReview}
-              placeholder="짧은 독서 감상문을 작성해 보세요."
             />
-
-            {/* 저장 버튼 */}
-            <Button title="저장" onPress={addReadingProgress} />
-
-            {/* 닫기 버튼 */}
-            <Button
-              title="닫기"
-              onPress={() => {
-                setIsFormVisible(false);
-                setPagesRead(""); // 입력 초기화
-                setReview("");
-                setSelectedBook(null);
-              }}
-              color="red"
-            />
+            <View style={styles.buttonGroup}>
+              <Button title="저장" onPress={addReadingProgress} />
+              <View style={{ marginTop: 10 }}>
+                <Button
+                  title="닫기"
+                  onPress={() => {
+                    setIsFormVisible(false);
+                    setPagesRead("");
+                    setReview("");
+                    setSelectedBook(null);
+                  }}
+                  color="red"
+                />
+              </View>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -177,25 +256,65 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
-  header: {
-    fontSize: 24,
+  text: {
+    marginBottom: 10,
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  logContainer: {
     marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingBottom: 10,
+  },
+  logHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  coverImage: {
+    width: 50,
+    height: 75,
+    resizeMode: "cover",
+    marginRight: 10,
+  },
+  placeholderImage: {
+    width: 50,
+    height: 75,
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  logDetails: {
+    flex: 1,
+  },
+  bookTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+    marginBottom: 5,
+    flexShrink: 1,
+  },
+  bookAuthor: {
+    fontSize: 14,
+    color: "#555",
+  },
+  reviewText: {
+    marginTop: 5,
+    fontSize: 14,
+    color: "#333",
   },
   formContainer: {
     marginTop: 20,
   },
   input: {
     borderWidth: 1,
-    marginBottom: 10,
-    padding: 10,
+    borderColor: "#ccc",
     borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
   },
-  picker: {
-    marginBottom: 20,
-  },
-  text: {
-    marginBottom: 10, // 각 텍스트 요소에 하단 마진을 추가
+  buttonGroup: {
+    marginTop: 20,
   },
 });
 
