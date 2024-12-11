@@ -38,6 +38,7 @@ const BookDetails = ({ book, onBack }) => {
 
       Alert.alert("도서가 나의 도서에 추가되었습니다!");
       setPageCount(''); // 입력 후 페이지 수 초기화
+      onBack();
     } catch (error) {
       console.error("Error adding document: ", error);
       Alert.alert("도서 추가 실패", error.message);
@@ -71,6 +72,7 @@ const BookDetails = ({ book, onBack }) => {
           onChangeText={setPageCount}
         />
         <Button title="나의 도서에 담기" onPress={handleAddToLibrary} />
+        <View style={styles.buttonSpacer} />
         <Button title="뒤로" onPress={onBack} />
       </View>
     </KeyboardAvoidingView>
@@ -116,6 +118,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderTopWidth: 1,
     borderTopColor: '#ddd',
+  },
+  buttonSpacer: {
+    height: 10, // 버튼 간격을 위한 높이
   },
 });
 

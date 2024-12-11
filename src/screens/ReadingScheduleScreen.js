@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import {
 } from "firebase/firestore";
 import { Picker } from "@react-native-picker/picker";
 import { Calendar } from "react-native-calendars";
+import { useFocusEffect } from "@react-navigation/native";
 
 const ReadingScheduleScreen = () => {
   const [selectedBook, setSelectedBook] = useState(null);
@@ -41,10 +42,16 @@ const ReadingScheduleScreen = () => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (user) {
-      const booksSnapshot = await getDocs(collection(db, "books"));
+      const booksQuery = query(
+        collection(db, "books"),
+        where("userId", "==", user.uid) // 사용자의 도서만 가져오기
+      );
+      const booksSnapshot = await getDocs(booksQuery);
+
       const booksList = booksSnapshot.docs
         .map((doc) => ({ id: doc.id, ...doc.data() }))
         .filter((book) => !book.isCompleted); // isCompleted가 true인 책은 제외
+
       setMyBooks(booksList);
     }
   };
@@ -142,8 +149,12 @@ const ReadingScheduleScreen = () => {
         let newReadPages = currentPages + parseInt(pagesRead, 10);
         let isCompleted = false;
 
+        // 실제로 저장할 읽은 페이지 수 계산
+        let validPagesRead = parseInt(pagesRead, 10);
+
         // readPages가 pageCount를 초과하지 않도록 처리
         if (newReadPages >= pageCount) {
+          validPagesRead = pageCount - currentPages;
           newReadPages = pageCount;
           isCompleted = true;
         }
@@ -164,6 +175,7 @@ const ReadingScheduleScreen = () => {
             isbn13: bookData.isbn13,
             title: bookData.title,
             date: selectedDate,
+            pages: validPagesRead, // 읽은 페이지 수 저장
             review: review.trim(),
           });
 
@@ -193,9 +205,11 @@ const ReadingScheduleScreen = () => {
     }
   };
 
-  useEffect(() => {
-    fetchMyBooks();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchMyBooks();
+    }, [])
+  );
 
   useEffect(() => {
     if (selectedDate) {
