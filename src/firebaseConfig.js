@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth'; 
 import { getFirestore } from 'firebase/firestore'; // Firestore 추가
+import { getStorage } from 'firebase/storage'; // Storage 추가
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'; 
 import firebaseConfig from '../firebase.json'; // Firebase 설정 가져오기
 
@@ -18,4 +19,6 @@ const auth = initializeAuth(app, {
 // Firestore 초기화
 const db = getFirestore(app);
 
-export { app, auth, db };
+const storage = getStorage(app); // Storage 초기화
+
+export { app, auth, db, storage };
