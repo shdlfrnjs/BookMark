@@ -151,7 +151,10 @@ const ReadingScheduleScreen = () => {
         // Update book data
         await updateDoc(bookRef, {
           readPages: newReadPages,
-          ...(isCompleted && { isCompleted: true }), // 다 읽은 책 표시
+          ...(isCompleted && {
+            isCompleted: true,
+            completedDate: selectedDate, // 다 읽은 날짜 저장
+          }),
         });
 
         try {
