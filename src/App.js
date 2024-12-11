@@ -10,6 +10,7 @@ import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
 import SettingsScreen from "./screens/SettingsScreen"; // 설정 화면 추가
 import MyBooksScreen from "./screens/MyBooksScreen";
+import MyReadingLogs from "./screens/MyReadingLogs";
 import ReadingScheduleScreen from "./screens/ReadingScheduleScreen";
 
 const Stack = createStackNavigator();
@@ -55,6 +56,7 @@ const App = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="나의 독서 기록" component={MyReadingLogs} />
       </Stack.Navigator>
     </NavigationContainer>
   );

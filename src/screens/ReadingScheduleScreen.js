@@ -82,48 +82,32 @@ const ReadingScheduleScreen = () => {
 
     const userId = user.uid;
 
-    const bookDetailsPromises = logs.map(async (log) => {
-      let bookData = null;
+    const bookDetails = await Promise.all(
+      logs
+        .filter((log) => log.userId === userId) // 로그인한 사용자만 필터링
+        .map(async (log) => {
+          let bookData = null;
 
-      // Query by ISBN if available
-      if (log.isbn13) {
-        const bookQuery = query(
-          collection(db, "books"),
-          where("isbn13", "==", log.isbn13),
-          where("userId", "==", userId)
-        );
-        const bookSnapshot = await getDocs(bookQuery);
+          // 책 ID(bookId)를 사용해 books 컬렉션에서 조회
+          if (log.bookId) {
+            const bookRef = doc(db, "books", log.bookId);
+            const bookSnap = await getDoc(bookRef);
 
-        if (!bookSnapshot.empty) {
-          bookData = bookSnapshot.docs[0].data();
-        }
-      }
+            if (bookSnap.exists()) {
+              bookData = bookSnap.data();
+            }
+          }
 
-      // If no ISBN or data not found, query by title and userId
-      if (!bookData && log.title) {
-        const titleQuery = query(
-          collection(db, "books"),
-          where("title", "==", log.title),
-          where("userId", "==", userId)
-        );
-        const titleSnapshot = await getDocs(titleQuery);
+          return {
+            cover: bookData?.cover || null,
+            title: bookData?.title || log.title || "제목 없음",
+            author: bookData?.author || "정보 없음",
+            review: log.review || "감상문 없음",
+          };
+        })
+    );
 
-        if (!titleSnapshot.empty) {
-          bookData = titleSnapshot.docs[0].data();
-        }
-      }
-
-      // Return fetched or default values
-      return {
-        cover: bookData?.cover || null,
-        title: bookData?.title || log.title || "제목 없음",
-        author: bookData?.author || "정보 없음",
-        review: log.review || "감상문 없음",
-      };
-    });
-
-    const details = await Promise.all(bookDetailsPromises);
-    setBookDetails(details);
+    setBookDetails(bookDetails);
   };
 
   // Save reading progress
@@ -172,6 +156,7 @@ const ReadingScheduleScreen = () => {
           // Save reading log
           await addDoc(collection(db, "readingLogs"), {
             userId: user.uid,
+            bookId: selectedBook,
             isbn13: bookData.isbn13,
             title: bookData.title,
             date: selectedDate,

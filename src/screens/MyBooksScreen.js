@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet, Image, Modal, TextInput, TouchableOpacity } from "react-native";
 import { getDocs, collection, query, where, addDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { getAuth } from "firebase/auth";
 import { useFocusEffect } from "@react-navigation/native";
 
-const MyBooksScreen = () => {
+const MyBooksScreen = ({ navigation }) => {
   const [myBooks, setMyBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -78,7 +78,10 @@ const MyBooksScreen = () => {
           const progress = (readPages / pageCount) * 100;
 
           return (
-            <View style={styles.bookItem}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("나의 독서 기록", { bookId: item.id })}
+              style={styles.bookItem}
+            >
               {item.cover ? (
                 <Image source={{ uri: item.cover }} style={styles.coverImage} />
               ) : (
@@ -98,12 +101,9 @@ const MyBooksScreen = () => {
                 <View style={styles.progressRow}>
                   <View style={styles.progressBarBackground}>
                     <View
-                      style={[
-                        styles.progressBarFill,
-                        {
-                          width: `${item.readPages && item.pageCount ? (Math.min((item.readPages / item.pageCount) * 100, 100)) : 0}%`,
-                        },
-                      ]}
+                      style={[styles.progressBarFill, {
+                        width: `${(item.readPages && item.pageCount ? (Math.min((item.readPages / item.pageCount) * 100, 100)) : 0)}%`,
+                      }]}
                     />
                   </View>
                   <Text style={styles.progressText}>{`${(item.readPages && item.pageCount ? Math.min((item.readPages / item.pageCount) * 100, 100) : 0).toFixed(1)}%`}</Text>
@@ -121,7 +121,7 @@ const MyBooksScreen = () => {
                   </TouchableOpacity>
                 )}
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />
@@ -146,13 +146,13 @@ const MyBooksScreen = () => {
             <View style={styles.modalButtonRow}>
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
-                style={styles.cancelButton}
+                style={[styles.button, styles.cancelButton]}
               >
                 <Text style={styles.buttonText}>취소</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleSaveReview}
-                style={styles.saveButton}
+                style={[styles.button, styles.saveButton]}
               >
                 <Text style={styles.buttonText}>저장</Text>
               </TouchableOpacity>
@@ -294,19 +294,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
   },
-  cancelButton: {
+  button: {
     flex: 1,
-    backgroundColor: "#ff0000",
     paddingVertical: 10,
-    marginRight: 5,
     borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#ff0000",
+    marginRight: 5,
   },
   saveButton: {
-    flex: 1,
     backgroundColor: "#0099fa",
-    paddingVertical: 10,
     marginLeft: 5,
-    borderRadius: 4,
   },
   buttonText: {
     color: "#fff",
