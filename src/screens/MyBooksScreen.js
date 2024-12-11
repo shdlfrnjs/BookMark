@@ -92,7 +92,7 @@ const MyBooksScreen = () => {
                 <Text style={styles.bookDetails}>저자: {author}</Text>
                 <Text style={styles.bookDetails}>출판사: {publisher}</Text>
                 <Text style={styles.readingProgress}>
-                  읽은 페이지: {item.readPages} / {item.pageCount}
+                  읽은 페이지: {item.readPages || 0} / {item.pageCount}
                 </Text>
 
                 <View style={styles.progressRow}>
@@ -100,11 +100,13 @@ const MyBooksScreen = () => {
                     <View
                       style={[
                         styles.progressBarFill,
-                        { width: `${Math.min(progress, 100)}%` },
+                        {
+                          width: `${item.readPages && item.pageCount ? (Math.min((item.readPages / item.pageCount) * 100, 100)) : 0}%`,
+                        },
                       ]}
                     />
                   </View>
-                  <Text style={styles.progressText}>{`${progress.toFixed(1)}%`}</Text>
+                  <Text style={styles.progressText}>{`${(item.readPages && item.pageCount ? Math.min((item.readPages / item.pageCount) * 100, 100) : 0).toFixed(1)}%`}</Text>
                 </View>
 
                 {progress >= 100 && (
@@ -224,7 +226,7 @@ const styles = StyleSheet.create({
   progressBarBackground: {
     height: 18,
     marginTop: 5,
-    width: "85%",
+    width: "83%",
     backgroundColor: "#e0e0e0",
     borderRadius: 10,
     overflow: "hidden",
@@ -238,6 +240,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
     fontSize: 14,
+    marginRight: 8,
+    textAlign: "right",
   },
   readingProgress: {
     fontSize: 14,
@@ -245,7 +249,8 @@ const styles = StyleSheet.create({
   },
   reviewButton: {
     marginTop: 8,
-    backgroundColor: "#1e90ff",
+    width: "95%",
+    backgroundColor: "#0099fa",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 4,
@@ -254,7 +259,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 14,
   },
   modalContainer: {
     flex: 1,
@@ -291,17 +296,17 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: "#ff4d4d",
+    backgroundColor: "#ff0000",
     paddingVertical: 10,
     marginRight: 5,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   saveButton: {
     flex: 1,
-    backgroundColor: "#4caf50",
+    backgroundColor: "#0099fa",
     paddingVertical: 10,
     marginLeft: 5,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   buttonText: {
     color: "#fff",
