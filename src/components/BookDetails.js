@@ -36,7 +36,7 @@ const BookDetails = ({ book, onBack }) => {
         pageCount: Number(pageCount),// 총 페이지 수
       });
 
-      Alert.alert("도서가 나의 도서에 추가되었습니다!");
+      Alert.alert("도서가 나의 도서에 추가되었습니다.");
       setPageCount(''); // 입력 후 페이지 수 초기화
       onBack();
     } catch (error) {
