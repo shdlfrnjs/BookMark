@@ -165,9 +165,9 @@ const ReadingScheduleScreen = () => {
           });
 
           Alert.alert(
-            "성공",
+            "독서 감상문",
             `읽은 페이지와 감상문이 저장되었습니다.${
-              isCompleted ? "\n축하합니다! 책을 다 읽었습니다! 나의 도서 탭에서 독후감을 작성해 보세요." : ""
+              isCompleted ? "\n축하합니다! 책을 다 읽었습니다!"+"\n나의 도서 탭에서 독후감을 작성해 보세요." : ""
             }`
           );
 
@@ -208,7 +208,7 @@ const ReadingScheduleScreen = () => {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.text}>날짜 선택:</Text>
+        <Text style={styles.text}>날짜 선택</Text>
         <Calendar
           onDayPress={(day) => {
             setSelectedDate(day.dateString);
@@ -222,7 +222,7 @@ const ReadingScheduleScreen = () => {
 
         {readingLogs.length > 0 && (
           <View style={{ marginTop: 20 }}>
-            <Text style={styles.text}>독서 기록:</Text>
+            <Text style={styles.text}>독서 기록</Text>
             {bookDetails.map((detail, index) => (
               <View key={index} style={styles.logContainer}>
                 <View style={styles.logHeader}>
