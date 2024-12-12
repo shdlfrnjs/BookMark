@@ -112,87 +112,99 @@ const SettingsScreen = () => {
         <Text style={styles.name}>{userInfo.name}</Text>
         <Text style={styles.email}>{userInfo.email}</Text>
       </View>
-
-      {/* 연도 선택 문구와 Picker */}
-      <Text style={styles.yearLabel}>연도 선택</Text>
-      <Picker
-        selectedValue={selectedYear}
-        onValueChange={(itemValue) => setSelectedYear(itemValue)}
-        style={styles.picker}
-      >
-        {years.map((year) => (
-          <Picker.Item key={year} label={year} value={year} />
-        ))}
-      </Picker>
-
+  
+      <View style={styles.separator} />
+      
+      {/* 월별 독서량과 셀렉트 박스를 한 줄에 배치 */}
+      <View style={styles.yearAndChartContainer}>
+        <Text style={styles.chartTitle}>연도별 독서 성과</Text>
+        <Picker
+          selectedValue={selectedYear}
+          onValueChange={(itemValue) => setSelectedYear(itemValue)}
+          style={styles.picker}
+          itemStyle={styles.pickerItem}
+        >
+          {years.map((year) => (
+            <Picker.Item key={year} label={year} value={year} />
+          ))}
+        </Picker>
+      </View>
+  
       {/* 월별 독서 그래프 */}
-      <Text style={styles.chartTitle}>월별 독서량 (권)</Text>
       <View style={styles.chartContainer}>
         <BarChart
           data={{
-            labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], // 월별 레이블 표시
+            labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
             datasets: [
               {
                 data: monthlyData,
               },
             ],
           }}
-          width={Dimensions.get('window').width - 20} // 20px의 여백을 제외하고 100% 너비
-          height={250}
-          yAxisInterval={yAxisInterval} // yAxisInterval을 1로 고정
-          segments={segments} // 세그먼트 수 설정
+          width={Dimensions.get('window').width - 20}
+          height={300}
+          yAxisInterval={yAxisInterval}
+          segments={segments}
           chartConfig={{
             backgroundColor: '#ffffff',
-            backgroundGradientFrom: '#ffffff', // 배경색을 하얀색으로 설정
+            backgroundGradientFrom: '#ffffff',
             backgroundGradientTo: '#ffffff',
             decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(0, 0, 139, ${opacity})`, // 막대기 색상: 진한 파란색으로 설정
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // 레이블 색상: 검정색
+            color: (opacity = 1) => `rgba(0, 0, 139, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             style: {
               borderRadius: 16,
-              paddingLeft: 10, // 차트 왼쪽 여백을 줄여서 y축과 간격 좁힘
+              paddingLeft: 10,
             },
             propsForDots: {
               r: '6',
               strokeWidth: '2',
               stroke: '#ffa726',
             },
-            yAxisMax: yAxisMax, // y축의 최대값을 maxBooks 또는 1로 설정
-            yAxisMin: yAxisMin, // y축 최소값을 0으로 설정
-            barPercentage: 0.3, // 막대기의 너비를 30%로 설정
-            categoryPercentage: 0.5, // 막대기 간의 간격을 좁히기 위해 카테고리 간격을 50%로 설정
-            fillShadowGradientFrom: '#00008b', // 막대기 위 색상과 동일하게 진한 파란색
-            fillShadowGradientTo: '#00008b',   // 막대기 위 색상과 동일하게 진한 파란색
-            fillShadowGradientOpacity: 1,      // 투명도 제거
+            yAxisMax: yAxisMax,
+            yAxisMin: yAxisMin,
+            barPercentage: 0.3,
+            categoryPercentage: 0.5,
+            fillShadowGradientFrom: '#00008b',
+            fillShadowGradientTo: '#00008b',
+            fillShadowGradientOpacity: 1,
           }}
           style={styles.chart}
         />
       </View>
-
+  
       <Button title="로그아웃" onPress={handleLogout} style={styles.logoutButton} />
     </View>
-  );
+  );  
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 20 },
   profileContainer: { alignItems: 'center', marginBottom: 20 },
-  profileImage: { width: 100, height: 100, borderRadius: 50, marginTop: 10, marginBottom: 5 },
+  profileImage: { width: 100, height: 100, borderRadius: 50, marginTop: 25, marginBottom: 5 },
   name: { fontSize: 20, fontWeight: 'bold' },
-  email: { fontSize: 16, color: '#555', marginBottom: 20 },
-  picker: { height: 50, width: 150, alignSelf: 'center', marginBottom: 20 },
-  chartTitle: { fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
-  chartContainer: {
-    width: '100%', // 전체 너비로 설정
-    alignItems: 'center', // 가운데 정렬
-  },
-  chart: { marginVertical: 10, borderRadius: 16 },
-  logoutButton: { marginTop: 20 },
-  yearLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  email: { fontSize: 16, color: '#555', marginBottom: 10 },
+  picker: { height: 50, width: 120, alignSelf: 'center', marginBottom: 0, justifyContent: 'center' },
+  pickerItem: {
     textAlign: 'center',
-    marginBottom: 10,
+    justifyContent: 'center',
+  },
+  chartTitle: { fontSize: 25, fontWeight: 'bold', textAlign: 'left', marginBottom: 10 },
+  chartContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  chart: { marginVertical: 10, borderRadius: 16, marginBottom: 12 },
+  logoutButton: { marginTop: 40 },
+  yearAndChartContainer: {
+    flexDirection: 'row', // 가로로 배치
+    alignItems: 'center', // 세로 정렬
+    justifyContent: 'space-between', // 사이 공간을 균등하게 배치
+  },
+  separator: {
+    height: 1, // 선의 높이
+    backgroundColor: '#ccc', // 선의 색상
+    marginBottom: 30, // 위아래 여백
   },
 });
 
