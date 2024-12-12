@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage 임포트
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import HomeScreen from "./screens/HomeScreen";
@@ -15,23 +15,23 @@ import MyReadingLogs from "./screens/MyReadingLogs";
 import ReadingScheduleScreen from "./screens/ReadingScheduleScreen";
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator(); // Tab.Navigator 사용
+const Tab = createBottomTabNavigator();
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true); // 로딩 상태 추가
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const user = await AsyncStorage.getItem('@user_info'); // 저장된 사용자 정보 확인
+        const user = await AsyncStorage.getItem('@user_info');
         if (user) {
-          setIsLoggedIn(true); // 로그인 정보가 있으면 로그인 상태로 설정
+          setIsLoggedIn(true);
         }
       } catch (error) {
         console.error("로그인 상태 확인 중 오류 발생", error);
       } finally {
-        setLoading(false); // 데이터 확인 후 로딩 상태 종료
+        setLoading(false);
       }
     };
     checkLoginStatus();
@@ -43,7 +43,6 @@ const App = () => {
         tabBarStyle: { backgroundColor: '#fff' },
         tabBarIcon: ({ color, size }) => {
           let iconName;
-  
           switch (route.name) {
             case "도서 검색":
               iconName = "search-outline";
@@ -55,12 +54,11 @@ const App = () => {
               iconName = "book-outline";
               break;
             case "마이페이지":
-              iconName = "person-outline"; 
+              iconName = "person-outline";
               break;
             default:
               iconName = "ellipse-outline";
           }
-  
           return <Icon name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "tomato",
@@ -75,7 +73,7 @@ const App = () => {
   );
 
   if (loading) {
-    return null; // 로딩 중일 때 아무 화면도 표시하지 않음
+    return null;
   }
 
   return (

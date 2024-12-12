@@ -1,4 +1,3 @@
-// src/screens/HomeScreen.js
 import React, { useState, useRef } from "react";
 import { View, StyleSheet, Keyboard, Text, ActivityIndicator } from "react-native";
 import SearchBar from "../components/SearchBar";

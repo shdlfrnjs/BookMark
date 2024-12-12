@@ -1,4 +1,3 @@
-// src/api/aladinApi.js
 import { ALADIN_API_KEY } from '@env';
 
 export const searchBooks = async (query) => {
@@ -14,9 +13,8 @@ export const searchBooks = async (query) => {
       throw new Error("API 호출 실패");
     }
 
-    const data = await response.json(); // JSON 형태로 응답 처리
+    const data = await response.json();
 
-    // 응답이 정상적인지 확인하고, 책 목록을 반환합니다.
     return data.item || [];
   } catch (error) {
     console.error("책 검색 중 오류 발생:", error);

@@ -1,4 +1,3 @@
-// src/components/SearchBar.js
 import React from "react";
 import { TextInput, Button, View, StyleSheet } from "react-native";
 

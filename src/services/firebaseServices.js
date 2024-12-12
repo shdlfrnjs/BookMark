@@ -7,7 +7,7 @@ export const addBook = async (bookData) => {
     const bookRef = collection(db, "books");
     await addDoc(bookRef, {
       ...bookData,
-      pagesRead: 0,  // 읽은 페이지 수 초기값 설정
+      pagesRead: 0,
     });
     console.log("책이 성공적으로 추가되었습니다.");
   } catch (error) {

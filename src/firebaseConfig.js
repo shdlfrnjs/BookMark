@@ -1,24 +1,21 @@
 import { initializeApp } from 'firebase/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth'; 
-import { getFirestore } from 'firebase/firestore'; // Firestore 추가
-import { getStorage } from 'firebase/storage'; // Storage 추가
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'; 
-import firebaseConfig from '../firebase.json'; // Firebase 설정 가져오기
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import firebaseConfig from '../firebase.json';
 
-// Firebase 앱 초기화
 let app;
 if (!app) {
   app = initializeApp(firebaseConfig);
 }
 
-// Firebase Auth 초기화 (AsyncStorage 사용)
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-// Firestore 초기화
 const db = getFirestore(app);
 
-const storage = getStorage(app); // Storage 초기화
+const storage = getStorage(app);
 
 export { app, auth, db, storage };

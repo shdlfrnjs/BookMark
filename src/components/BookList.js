@@ -1,10 +1,9 @@
-// src/components/BookList.js
 import React, { forwardRef } from "react";
 import { FlatList, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 
 const BookList = forwardRef(({ books, onSelectBook }, ref) => (
   <FlatList
-    ref={ref} // ref 전달
+    ref={ref}
     data={books}
     keyExtractor={(item) => item.itemId.toString()}
     renderItem={({ item }) => (

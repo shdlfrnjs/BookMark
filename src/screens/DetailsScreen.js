@@ -1,4 +1,3 @@
-// src/screens/DetailsScreen.js
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import BookDetails from "../components/BookDetails";
@@ -15,7 +14,7 @@ const DetailsScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" }, // 기본 스타일
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
 });
 
 export default DetailsScreen;
