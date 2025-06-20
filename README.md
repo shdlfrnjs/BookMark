@@ -1,4 +1,4 @@
-# BookmarK 책갈피 APP 📚  
+# BookmarK 📚  
 **개인 맞춤형 독서 관리 애플리케이션**
 
 > Expo 기반 React Native 앱 | Firebase & Aladin API 사용  
