@@ -63,7 +63,7 @@
 
 ## 📚 참고 자료
 
-- [처음 배우는 리액트 네이티브 (도서)](https://book.naver.com/bookdb/book_detail.nhn?bid=15501900](https://www.hanbit.co.kr/store/books/look.php?p_code=B8811528616)
+- [처음 배우는 리액트 네이티브 (도서)](https://www.hanbit.co.kr/store/books/look.php?p_code=B8811528616)
 - [react-native-calendars GitHub](https://github.com/wix/react-native-calendars)
 - [react-native-chart-kit NPM](https://www.npmjs.com/package/react-native-chart-kit)
 
