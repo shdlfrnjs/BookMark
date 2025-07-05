@@ -48,7 +48,10 @@
 
 ## 🖼️ 화면 예시
 
-> (시연 영상 또는 주요 화면 캡처 삽입 가능)
+<video width="850" controls>
+  <source src="./demo/demo.mp4" type="video/mp4">
+  브라우저가 video 태그를 지원하지 않습니다.
+</video>
 
 ---
 
