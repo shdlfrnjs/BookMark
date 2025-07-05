@@ -48,10 +48,7 @@
 
 ## 📸 프로젝트 시연
 
-<video width="850" controls>
-  <source src="./video/demo.mp4" type="video/mp4">
-  브라우저가 video 태그를 지원하지 않습니다.
-</video>
+[![유튜브 시연 영상](https://img.youtube.com/vi/9HKsf3Xt9hM/0.jpg)](https://www.youtube.com/shorts/9HKsf3Xt9hM)  
 
 ▶️ [시연영상 다운로드 링크](./video/demo.mp4)
 
