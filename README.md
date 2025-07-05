@@ -46,12 +46,14 @@
 
 ---
 
-## 🖼️ 화면 예시
+## 📸 프로젝트 시연
 
 <video width="850" controls>
-  <source src="./demo/demo.mp4" type="video/mp4">
+  <source src="./video/demo.mp4" type="video/mp4">
   브라우저가 video 태그를 지원하지 않습니다.
 </video>
+
+▶️ [시연영상 다운로드 링크](./video/demo.mp4)
 
 ---
 
