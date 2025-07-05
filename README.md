@@ -48,9 +48,11 @@
 
 ## 📸 프로젝트 시연
 
+▶️ **[클릭하면 유튜브에서 시연 영상을 시청할 수 있습니다](https://www.youtube.com/shorts/9HKsf3Xt9hM)**  
+
 [![유튜브 시연 영상](https://img.youtube.com/vi/9HKsf3Xt9hM/0.jpg)](https://www.youtube.com/shorts/9HKsf3Xt9hM)  
 
-▶️ [시연영상 다운로드 링크](./video/demo.mp4)
+📥 [시연 영상 직접 다운로드 (.mp4)](./video/demo.mp4)
 
 ---
 
