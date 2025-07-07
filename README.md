@@ -72,7 +72,3 @@
 - [react-native-chart-kit NPM](https://www.npmjs.com/package/react-native-chart-kit)
 
 ---
-
-## 🙌 감사합니다!
-
----
